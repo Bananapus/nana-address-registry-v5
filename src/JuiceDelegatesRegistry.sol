@@ -30,6 +30,11 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
     error juiceDelegatesRegistry_authError();
 
     /**
+     * @notice Emitted when a deployed delegate is added
+     */
+    event DelegateAdded(address indexed _delegate, address indexed _deployer);
+
+    /**
      * @notice         The deployer addresses which are recognized as trusted
      * @custom:params  _deployer The address of the deployer
      * @custom:returns _isDeployer Whether the address is a trusted deployer
@@ -104,5 +109,7 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
 
         // If so, add it with the msg.sender as the deployer
         trustedJuiceDelegates[_delegate] = msg.sender;
+
+        emit DelegateAdded(_delegate, msg.sender);
     }
 }

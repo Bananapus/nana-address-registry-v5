@@ -2,7 +2,6 @@
 @juice-delegate-registry/=src/
 @openzeppelin/=node_modules/@openzeppelin/
 @paulrberg/=node_modules/@paulrberg/
+prb-math/=node_modules/prb-math/
 ds-test/=lib/ds-test/src/
 forge-std/=lib/forge-std/src/
-prb-math/=node_modules/prb-math/
-v3-periphery/=lib/v3-periphery/contracts/
