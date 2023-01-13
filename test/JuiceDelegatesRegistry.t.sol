@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "@juice-delegate-registry/JuiceDelegatesRegistry.sol";
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';
 import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
-
-import "@juice-delegate-registry/JuiceDelegatesRegistry.sol";
-import "forge-std/Test.sol";
+import 'forge-std/Test.sol';
 
 contract JuiceDelegatesRegistryTest is Test {
     event DelegateAdded(address indexed _delegate, address indexed _deployer);

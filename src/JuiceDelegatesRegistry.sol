@@ -4,7 +4,6 @@ pragma solidity ^0.8.17;
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
-
 import './interface/IJuiceDelegatesRegistry.sol';
 
 /**
