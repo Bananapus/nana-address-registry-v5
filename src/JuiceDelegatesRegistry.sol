@@ -17,6 +17,11 @@ import './interface/IJuiceDelegatesRegistry.sol';
  *      
  */
 contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
+    //////////////////////////////////////////////////////////////
+    //                                                          //
+    //                   ERRORS & EVENTS                        //
+    //                                                          //
+    //////////////////////////////////////////////////////////////
     
     /**
      * @notice Throws if the delegate is not compatible with the Juicebox protocol (based on ERC165)
@@ -32,6 +37,12 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
      * @notice Emitted when a deployed delegate is added
      */
     event DelegateAdded(address indexed _delegate, address indexed _deployer);
+
+    //////////////////////////////////////////////////////////////
+    //                                                          //
+    //                  PUBLIC STATE VARIABLES                  //
+    //                                                          //
+    //////////////////////////////////////////////////////////////
 
     /**
      * @notice         The deployer addresses which are recognized as trusted
@@ -55,6 +66,12 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
      */
     mapping(address => bool) public override admins;
 
+    //////////////////////////////////////////////////////////////
+    //                                                          //
+    //                      MODIFIERS                           //
+    //                                                          //
+    //////////////////////////////////////////////////////////////
+
     /**
      * @notice Modifier to restrict access to trusted deployers
      */
@@ -70,6 +87,12 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
         if(!admins[msg.sender]) revert juiceDelegatesRegistry_authError();
         _;
     }
+
+    //////////////////////////////////////////////////////////////
+    //                                                          //
+    //                     EXTERNAL METHODS                     //
+    //                                                          //
+    //////////////////////////////////////////////////////////////
 
     /**
      * @notice Constructor: grant msg.sender admin access
@@ -102,9 +125,12 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
      */
     function addTrustedDelegate(address _delegate) external override onlyDeployer {
         // Check if the delegate declares support for the IJBPayDelegate or IJBRedemptionDelegate interface
-        if( !(ERC165Checker.supportsInterface(_delegate, type(IJBPayDelegate).interfaceId)
-        || ERC165Checker.supportsInterface(_delegate, type(IJBRedemptionDelegate).interfaceId)) )
-            revert juiceDelegatesRegistry_incompatibleDelegate();
+        if(
+            !(
+                ERC165Checker.supportsInterface(_delegate, type(IJBPayDelegate).interfaceId)
+                || ERC165Checker.supportsInterface(_delegate, type(IJBRedemptionDelegate).interfaceId)
+            )
+        ) revert juiceDelegatesRegistry_incompatibleDelegate();
 
         // If so, add it with the msg.sender as the deployer
         trustedJuiceDelegates[_delegate] = msg.sender;
