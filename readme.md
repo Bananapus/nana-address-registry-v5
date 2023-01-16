@@ -17,6 +17,12 @@ Front-end might then call the view function `registry.deployerOf(newDelegate)` t
 - IJBDelegatesRegistry; the registry interface
 - IJBRegisteredDelegate: the interface to implement for a delegate wishing to be included in the registry
 
+## Usage
+Anyone can deploy this registry using the provided forge script.
+In other to run this repo, you'll need [Foundry](https://book.getfoundry.sh/) and [NodeJS](https://nodejs.dev/en/learn/how-to-install-nodejs/) installed.
+Install the dependencies with `npm install && git submodule update --init --force --recursive`, you should then be able
+to run the tests using `forge test` or deploy a new registry using `forge script Deploy` (and the correct arguments, based on the chain and key you want to use - see the [Foundry docs](https://book.getfoundry.sh/)).
+
 ## Use-case
 This registry allows frontend to easily and trustlessly query the deployer behind a given delegate. This might then used to assume a delegate as "safe" or not, based on front-end opinion.
 
