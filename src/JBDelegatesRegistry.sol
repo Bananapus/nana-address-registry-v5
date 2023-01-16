@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';
-import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';
-import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRegisteredDelegate.sol';
+import { IJBPayDelegate } from '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';
+import { IJBRedemptionDelegate } from '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';
+import { ERC165Checker } from '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
 
-import '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
-import './interface/IJuiceDelegatesRegistry.sol';
+import { IJBDelegatesRegistry } from './interfaces/IJBDelegatesRegistry.sol';
+import { IJBRegisteredDelegate } from './interfaces/IJBRegisteredDelegate.sol';
 
 /**
  * @title   JuiceDelegatesRegistry
