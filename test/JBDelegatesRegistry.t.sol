@@ -143,7 +143,7 @@ contract JBDelegatesRegistryTest is Test {
         vm.etch(_delegate, '69420');
         
         // Check: Is the transaction reverting?
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.juiceDelegatesRegistry_incompatibleDelegate.selector));
+        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
         vm.prank(_deployer);
 
         // -- transaction --
@@ -177,7 +177,7 @@ contract JBDelegatesRegistryTest is Test {
         );
 
         // Check: Is the transaction reverting?
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.juiceDelegatesRegistry_incompatibleDelegate.selector));
+        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
 
         // -- transaction --
         vm.prank(_deployer);
@@ -211,7 +211,7 @@ contract JBDelegatesRegistryTest is Test {
         );
 
         // Check: Is the transaction reverting?
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.juiceDelegatesRegistry_incompatibleDelegate.selector));
+        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
 
         // -- transaction --
         vm.prank(_deployer);
@@ -224,7 +224,7 @@ contract JBDelegatesRegistryTest is Test {
         address _delegate = makeAddr("_delegate");
 
         // Check: Is the transaction reverting?       
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.juiceDelegatesRegistry_incompatibleDelegate.selector));
+        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
         vm.prank(_deployer);
 
         // -- transaction --

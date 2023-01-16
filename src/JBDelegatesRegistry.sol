@@ -30,7 +30,7 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
     /**
      * @notice Throws if the delegate is not compatible with the Juicebox protocol (based on ERC165)
      */
-    error juiceDelegatesRegistry_incompatibleDelegate();
+    error JBDelegatesRegistry_incompatibleDelegate();
 
     /**
      * @notice Emitted when a deployed delegate is added
@@ -58,7 +58,7 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
     //////////////////////////////////////////////////////////////
 
     /**
-     * @notice Add a delegate to the registry
+     * @notice Add a delegate to the registry (needs to implement erc165, a delegate type and registeredDelegate)
      * @param _delegate The address of the delegate
      */
     function addDelegate(address _delegate) external override {
@@ -69,7 +69,7 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
                 || ERC165Checker.supportsInterface(_delegate, type(IJBRedemptionDelegate).interfaceId))
                 && ERC165Checker.supportsInterface(_delegate, type(IJBRegisteredDelegate).interfaceId)
             )
-        ) revert juiceDelegatesRegistry_incompatibleDelegate();
+        ) revert JBDelegatesRegistry_incompatibleDelegate();
 
         // If so, add it with the deployer
         address _deployer = IJBRegisteredDelegate(_delegate).deployer();
