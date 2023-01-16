@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "@juice-delegate-registry/JuiceDelegatesRegistry.sol";
+import "@juice-delegate-registry/JBDelegatesRegistry.sol";
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRegisteredDelegate.sol';
@@ -9,7 +9,7 @@ import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRegisteredDeleg
 import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import 'forge-std/Test.sol';
 
-contract JuiceDelegatesRegistryTest is Test {
+contract JBDelegatesRegistryTest is Test {
     event DelegateAdded(address indexed _delegate, address indexed _deployer);
 
     address _owner = makeAddr("_owner");
@@ -17,9 +17,6 @@ contract JuiceDelegatesRegistryTest is Test {
 
     JuiceDelegatesRegistry registry;
 
-    /**
-     * @dev Setup is deploying the registry and set one address as trusted deployer, for later use
-     */
     function setUp() public {
         registry = new JuiceDelegatesRegistry();
     }

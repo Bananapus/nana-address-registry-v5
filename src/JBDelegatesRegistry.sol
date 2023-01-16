@@ -11,14 +11,16 @@ import './interface/IJuiceDelegatesRegistry.sol';
 /**
  * @title   JuiceDelegatesRegistry
  *
- * @notice  This contract is used to register Juicebox Delegates
- *          that are trusted to be used by Juicebox projects.
+ * @notice  This contract is used to register deployers of Juicebox Delegates
  *          It is the deployer responsability to register their
- *          delegates in this registry.
+ *          delegates in this registry and make sure the delegate exposes the
+ *          deployer address (using IJBRegisteredDelegate and, eg, assigning msg.sender
+ *          to a globale variable 'deployer' in the delegate constructor.
+ *
  * @dev     Mostly for front-end integration purposes.
  *      
  */
-contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
+contract JBDelegatesRegistry is IJBDelegatesRegistry {
     //////////////////////////////////////////////////////////////
     //                                                          //
     //                   ERRORS & EVENTS                        //
@@ -56,7 +58,7 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
     //////////////////////////////////////////////////////////////
 
     /**
-     * @notice Add a trusted delegate to the registry
+     * @notice Add a delegate to the registry
      * @param _delegate The address of the delegate
      */
     function addDelegate(address _delegate) external override {
@@ -69,7 +71,7 @@ contract JuiceDelegatesRegistry is IJuiceDelegatesRegistry {
             )
         ) revert juiceDelegatesRegistry_incompatibleDelegate();
 
-        // If so, add it with the msg.sender as the deployer
+        // If so, add it with the deployer
         address _deployer = IJBRegisteredDelegate(_delegate).deployer();
         deployerOf[_delegate] = _deployer;
 
