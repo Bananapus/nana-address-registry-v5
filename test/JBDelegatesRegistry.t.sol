@@ -24,7 +24,12 @@ contract JBDelegatesRegistryTest is Test {
     /**
      * @custom:test When adding a pay delegate, the transaction is successful, correct event is emited and the delegate is added to the mapping
      */
-    function test_addDelegate_addPayDelegateFromEOA() public {
+    function test_addDelegate_addPayDelegateFromEOA(uint16 _nonce) public {
+        // Set the nonce of the deployer EOA (if we need to increase it)
+        vm.assume(_nonce >= vm.getNonce(address(_deployer)));
+        if (vm.getNonce(address(_deployer)) != _nonce)
+            vm.setNonce(address(_deployer), _nonce);
+
         vm.prank(_deployer);
         address _mockValidDelegate = address(new MockValidDelegate(type(IJBPayDelegate).interfaceId));
 
@@ -33,7 +38,7 @@ contract JBDelegatesRegistryTest is Test {
         emit DelegateAdded(_mockValidDelegate, _deployer);
 
         // -- transaction --
-        registry.addDelegate(_deployer, 0);
+        registry.addDelegate(_deployer, _nonce);
 
         // Check: is delegate added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(_mockValidDelegate) == _deployer);
@@ -42,7 +47,12 @@ contract JBDelegatesRegistryTest is Test {
     // /**
     //  * @custom:test When adding a redemption delegate, the transaction is successful, correct event is emited and the delegate is added to the mapping
     //  */
-    function test_addDelegate_addRedemptionDelegateFromEOA() public {
+    function test_addDelegate_addRedemptionDelegateFromEOA(uint16 _nonce) public {
+        // Set the nonce of the deployer EOA (if we need to increase it)
+        vm.assume(_nonce >= vm.getNonce(address(_deployer)));
+        if (vm.getNonce(address(_deployer)) != _nonce)
+            vm.setNonce(address(_deployer), _nonce);
+
         vm.prank(_deployer);
         MockValidDelegate _mockValidDelegate = new MockValidDelegate(type(IJBRedemptionDelegate).interfaceId);
 
@@ -51,7 +61,7 @@ contract JBDelegatesRegistryTest is Test {
         emit DelegateAdded(address(_mockValidDelegate), _deployer);
 
         // -- transaction --
-        registry.addDelegate(_deployer, 0);
+        registry.addDelegate(_deployer, _nonce);
 
         // Check: is delegate added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(address(_mockValidDelegate)) == _deployer);
@@ -61,8 +71,15 @@ contract JBDelegatesRegistryTest is Test {
      * @custom:test When adding a delegate deployed from a contract, the transaction is successful, correct event
      *              is emited and the delegate is added to the mapping
      */
-    function test_addDelegate_addDelegateFromContract() public {
+    function test_addDelegate_addDelegateFromContract(uint16 _nonce) public {
         MockDeployer _mockDeployer = new MockDeployer();
+
+        // Set the nonce of the deployer contract (if we need to increase it)
+        vm.assume(_nonce >= vm.getNonce(address(_mockDeployer)));
+        if (vm.getNonce(address(_mockDeployer)) != _nonce)
+            vm.setNonce(address(_mockDeployer), _nonce);
+
+        // Deploy the new delegate
         address _mockValidDelegate = _mockDeployer.deploy();
 
         // Check: Is the correct event emitted?
@@ -70,7 +87,7 @@ contract JBDelegatesRegistryTest is Test {
         emit DelegateAdded(_mockValidDelegate, address(_mockDeployer));
 
         // -- transaction --
-        registry.addDelegate(address(_mockDeployer), 1); // Nonce starts at 1 for contracts
+        registry.addDelegate(address(_mockDeployer), _nonce); // Nonce starts at 1 for contracts
 
         // Check: is delegate added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(_mockValidDelegate) == address(_mockDeployer));
@@ -112,14 +129,16 @@ contract JBDelegatesRegistryTest is Test {
     /**
      * @custom:test When adding a delegate which is not a contract (incorrect nonce or not deployed yet), the transaction reverts
      */
-    function test_addDelegate_revert_notAContract(uint8 _wrongNonce) public {
-        // Drop the correct nonces (0 and 1)
-        vm.assume(_wrongNonce > 1);
+    function test_addDelegate_revert_notAContract(uint16 _nonce, uint16 _wrongNonce) public {
+        vm.assume(_nonce != _wrongNonce);
 
-        vm.startPrank(_deployer);
+        // Set the nonce of the deployer contract (if we need to increase it)
+        vm.assume(_nonce >= vm.getNonce(address(_deployer)));
+        if (vm.getNonce(address(_deployer)) != _nonce)
+            vm.setNonce(address(_deployer), _nonce);
+
+        vm.prank(_deployer);
         address _mockValidDelegateNonceZero = address(new MockValidDelegate(type(IJBPayDelegate).interfaceId));
-        address _mockValidDelegateNonceOne = address(new MockValidDelegate(type(IJBPayDelegate).interfaceId));
-        vm.stopPrank();
 
         // Check: Is the transaction reverting?       
         vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
@@ -130,11 +149,7 @@ contract JBDelegatesRegistryTest is Test {
         // Check: correct nonce are still working
         vm.expectEmit(true, true, true, true);
         emit DelegateAdded(address(_mockValidDelegateNonceZero), _deployer);
-        registry.addDelegate(_deployer, 0);
-
-        vm.expectEmit(true, true, true, true);
-        emit DelegateAdded(address(_mockValidDelegateNonceOne), _deployer);
-        registry.addDelegate(_deployer, 1);
+        registry.addDelegate(_deployer, _nonce);
     }
 
     /**
