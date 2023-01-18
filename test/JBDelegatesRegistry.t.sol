@@ -100,7 +100,7 @@ contract JBDelegatesRegistryTest is Test {
             && _unknowInterfaceId != type(IJBRedemptionDelegate).interfaceId);
 
         vm.prank(_deployer);
-        MockValidDelegate _mockValidDelegate = new MockValidDelegate(_unknowInterfaceId);
+        new MockValidDelegate(_unknowInterfaceId);
 
         // Check: Is the transaction reverting?
         vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
