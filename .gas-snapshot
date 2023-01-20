@@ -1,0 +1,7 @@
+JBDelegatesRegistryTest:test_addDelegate_addDelegateFromContract(bytes32) (runs: 256, μ: 305193, ~: 305193)
+JBDelegatesRegistryTest:test_addDelegate_addDelegateFromContract(uint16) (runs: 256, μ: 295114, ~: 295168)
+JBDelegatesRegistryTest:test_addDelegate_addPayDelegateFromEOA(uint16) (runs: 256, μ: 145398, ~: 145492)
+JBDelegatesRegistryTest:test_addDelegate_addRedemptionDelegateFromEOA(uint16) (runs: 256, μ: 148375, ~: 148469)
+JBDelegatesRegistryTest:test_addDelegate_revert_notAContract(uint16,uint16) (runs: 256, μ: 150684, ~: 150708)
+JBDelegatesRegistryTest:test_addDelegate_revert_notDelegate(bytes4) (runs: 256, μ: 120348, ~: 120348)
+JBDelegatesRegistryTest:test_addDelegate_revert_notERC165() (gas: 17617)
