@@ -1,4 +1,14 @@
 {
+  "name": "@jbx-protocol/juice-delegates-registry",
+  "bugs": {
+    "url": "https://github.com/jbx-protocol/juice-delegates-registry/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jbx-protocol/juice-delegates-registry"
+  },
+  "version": "1.0.0",
+  "license": "MIT",
   "dependencies": {
     "@jbx-protocol/juice-contracts-v3": "^2.0.3",
     "@openzeppelin/contracts": "^4.8.0",
