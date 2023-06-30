@@ -14,11 +14,12 @@ contract JBDelegatesRegistryTest is Test {
 
     address _owner = makeAddr("_owner");
     address _deployer = makeAddr("_deployer");
+    IJBDelegatesRegistry _previousRegistry = IJBDelegatesRegistry(makeAddr("_previousRegistry"));
 
     JBDelegatesRegistry registry;
 
     function setUp() public {
-        registry = new JBDelegatesRegistry();
+        registry = new JBDelegatesRegistry(_previousRegistry);
     }
 
     /**

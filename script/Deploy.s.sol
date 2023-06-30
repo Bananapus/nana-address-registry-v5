@@ -7,7 +7,11 @@ import 'forge-std/Script.sol';
 contract Deploy is Script {
 
     function run() public {
+
+        // Change me
+        IJBDelegatesRegistry _previousRegistry = IJBDelegatesRegistry(address(0));
+
         vm.broadcast();
-        console.log(address(new JBDelegatesRegistry()));
+        console.log(address(new JBDelegatesRegistry(_previousRegistry)));
     }
 }

@@ -33,15 +33,57 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
 
     //////////////////////////////////////////////////////////////
     //                                                          //
-    //                  PUBLIC STATE VARIABLES                  //
+    //                          CONSTANTS                       //
     //                                                          //
     //////////////////////////////////////////////////////////////
 
     /**
-     * @notice         Track which deployer deployed a delegate, based on a
-     *                 proactive deployer update
+     * @notice The previous registry, used for retrocompatibility
      */
-    mapping(address _delegate => address _deployer) public override deployerOf;
+    IJBDelegatesRegistry public immutable oldRegistry;
+
+    //////////////////////////////////////////////////////////////
+    //                                                          //
+    //                  INTERNAL STATE VARIABLES                //
+    //                                                          //
+    //////////////////////////////////////////////////////////////
+
+    /**
+     * @notice  Track which deployer deployed a delegate, based on a
+     *          proactive deployer update
+     */
+    mapping(address _delegate => address _deployer) internal _deployerOf;
+
+    //////////////////////////////////////////////////////////////
+    //                                                          //
+    //                          CONSTRUCTOR                     //
+    //                                                          //
+    //////////////////////////////////////////////////////////////
+    
+    constructor(IJBDelegatesRegistry _oldRegistry) {
+        oldRegistry = _oldRegistry;
+    }
+
+    //////////////////////////////////////////////////////////////
+    //                                                          //
+    //                 EXTERNAL VIEW FUNCTIONS                  //
+    //                                                          //
+    //////////////////////////////////////////////////////////////
+
+    /**
+     * @notice  Get the deployer of a delegate
+     *
+     * @dev     This function prototype mimick the mapping getter from the previous
+     *          registry, in order to keep the interface unchanged
+     * @param   _delegate The delegate address
+     * @return  _deployer The deployer address
+     */
+    function deployerOf(address _delegate) external view override returns (address _deployer) {
+        _deployer = _deployerOf[_delegate];
+
+        // Retrocompatibility: return the entry from the previous registry, if none are found in this one
+        if(_deployer == address(0)) _deployer = oldRegistry.deployerOf(_delegate);
+    }
 
     //////////////////////////////////////////////////////////////
     //                                                          //
@@ -100,7 +142,7 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
      */
     function _addDelegate(address _delegate, address _deployer) internal {
         // add it with the deployer
-        deployerOf[_delegate] = _deployer;
+        _deployerOf[_delegate] = _deployer;
 
         emit DelegateAdded(_delegate, _deployer);
     }
