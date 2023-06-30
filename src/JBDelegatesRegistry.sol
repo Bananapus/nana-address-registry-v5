@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
-
-import { IJBPayDelegate } from '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';
-import { IJBRedemptionDelegate } from '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';
-import { ERC165Checker } from '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
+pragma solidity ^0.8.19;
 
 import { IJBDelegatesRegistry } from './interfaces/IJBDelegatesRegistry.sol';
 
@@ -44,10 +40,8 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
     /**
      * @notice         Track which deployer deployed a delegate, based on a
      *                 proactive deployer update
-     * @custom:params  _delegate The address of the delegate
-     * @custom:returns _deployer The address of the corresponding deployer
      */
-    mapping(address => address) public override deployerOf;
+    mapping(address _delegate => address _deployer) public override deployerOf;
 
     //////////////////////////////////////////////////////////////
     //                                                          //
@@ -68,7 +62,7 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
         address _delegate = _addressFrom(_deployer, _nonce);
 
         // Add the delegate based on the computed address
-        _checkAndAddDelegate(_delegate, _deployer);
+        _addDelegate(_delegate, _deployer);
     }
 
     /**
@@ -90,7 +84,7 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
         )))));
 
         // Add the delegate based on the computed address
-        _checkAndAddDelegate(_delegate, _deployer);
+        _addDelegate(_delegate, _deployer);
     }
 
     //////////////////////////////////////////////////////////////
@@ -99,14 +93,13 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
     //                                                          //
     //////////////////////////////////////////////////////////////
 
-    function _checkAndAddDelegate(address _delegate, address _deployer) internal {
-        // Check if the delegate declares implementing a pay or redemption delegate
-        if(
-            !(ERC165Checker.supportsInterface(_delegate, type(IJBPayDelegate).interfaceId)
-            || ERC165Checker.supportsInterface(_delegate, type(IJBRedemptionDelegate).interfaceId))
-        ) revert JBDelegatesRegistry_incompatibleDelegate();
-
-        // If so, add it with the deployer
+    /**
+     * @notice Add a delegate to the mapping
+     * @param _delegate the delegate address
+     * @param _deployer the deployer address
+     */
+    function _addDelegate(address _delegate, address _deployer) internal {
+        // add it with the deployer
         deployerOf[_delegate] = _deployer;
 
         emit DelegateAdded(_delegate, _deployer);

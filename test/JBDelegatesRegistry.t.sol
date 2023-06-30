@@ -92,66 +92,7 @@ contract JBDelegatesRegistryTest is Test {
         // Check: is delegate added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(_mockValidDelegate) == address(_mockDeployer));
     }
-
-    /**
-     * @custom:test When adding a contract which doesn't implement IERC165, the transaction reverts
-     */
-    function test_addDelegate_revert_notERC165() public {
-        // There is a bytecode at the _delegate address (vm.etch) but no IERC165 mocked call
-        address _delegate = makeAddr("_delegate");
-        vm.etch(_delegate, '69420');
-        
-        // Check: Is the transaction reverting?
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
-        vm.prank(_deployer);
-
-        // -- transaction --
-        registry.addDelegate(_deployer, 1);
-    }
-
-    /**
-     * @custom:test When adding a contract which doesn't implement IJBPayDelegate or IJBRedemptionDelegate, the transaction reverts
-     */
-    function test_addDelegate_revert_notDelegate(bytes4 _unknowInterfaceId) public {
-        vm.assume(_unknowInterfaceId != type(IJBPayDelegate).interfaceId
-            && _unknowInterfaceId != type(IJBRedemptionDelegate).interfaceId);
-
-        vm.prank(_deployer);
-        new MockValidDelegate(_unknowInterfaceId);
-
-        // Check: Is the transaction reverting?
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
-
-        // -- transaction --
-        registry.addDelegate(_deployer, 0);
-    }
-        
-    /**
-     * @custom:test When adding a delegate which is not a contract (incorrect nonce or not deployed yet), the transaction reverts
-     */
-    function test_addDelegate_revert_notAContract(uint16 _nonce, uint16 _wrongNonce) public {
-        vm.assume(_nonce != _wrongNonce);
-
-        // Set the nonce of the deployer contract (if we need to increase it)
-        vm.assume(_nonce >= vm.getNonce(address(_deployer)));
-        if (vm.getNonce(address(_deployer)) != _nonce)
-            vm.setNonce(address(_deployer), _nonce);
-
-        vm.prank(_deployer);
-        address _mockValidDelegateNonceZero = address(new MockValidDelegate(type(IJBPayDelegate).interfaceId));
-
-        // Check: Is the transaction reverting?       
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
-        
-        // -- transaction --
-        registry.addDelegate(_deployer, _wrongNonce);
-
-        // Check: correct nonce are still working
-        vm.expectEmit(true, true, true, true);
-        emit DelegateAdded(address(_mockValidDelegateNonceZero), _deployer);
-        registry.addDelegate(_deployer, _nonce);
-    }
-
+    
     /**
      * @custom:test When adding a delegate deployed from a contract using create2, the transaction is
      *              successful, correct event is emited and the delegate is added to the mapping
@@ -173,22 +114,12 @@ contract JBDelegatesRegistryTest is Test {
     }
 }
 
-contract MockValidDelegate is IERC165 {
+contract MockValidDelegate {
     // this contract can mock implementing any interface, a pay delegate by default
     bytes4 _delegateType;
 
     constructor(bytes4 _interfaceId) {
         _delegateType = _interfaceId;
-    }
-
-    /**
-     * @notice              The ierc165 supportsInterface function
-     * @param interfaceId   The interface id to check
-     * @return              True if the interface is supported
-     */
-    function supportsInterface(bytes4 interfaceId) external override view returns(bool) {
-        return interfaceId == type(IERC165).interfaceId
-            || interfaceId == _delegateType;
     }
 }
 
