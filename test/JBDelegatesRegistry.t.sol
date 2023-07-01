@@ -20,6 +20,8 @@ contract JBDelegatesRegistryTest is Test {
 
     function setUp() public {
         registry = new JBDelegatesRegistry(_previousRegistry);
+
+        vm.etch(address(_previousRegistry), bytes('69'));
     }
 
     /**
@@ -45,9 +47,9 @@ contract JBDelegatesRegistryTest is Test {
         assertTrue(registry.deployerOf(_mockValidDelegate) == _deployer);
     }
 
-    // /**
-    //  * @custom:test When adding a redemption delegate, the transaction is successful, correct event is emited and the delegate is added to the mapping
-    //  */
+    /**
+     * @custom:test When adding a redemption delegate, the transaction is successful, correct event is emited and the delegate is added to the mapping
+     */
     function test_addDelegate_addRedemptionDelegateFromEOA(uint16 _nonce) public {
         // Set the nonce of the deployer EOA (if we need to increase it)
         vm.assume(_nonce >= vm.getNonce(address(_deployer)));
@@ -112,6 +114,18 @@ contract JBDelegatesRegistryTest is Test {
 
         // Check: is delegate added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(_mockValidDelegate) == address(_mockDeployerCreate2));
+    }
+
+    /**
+     * @custom:test When a deployer isn't found, try calling the previous registry
+     */
+    function test_delegateOf_retrocompatible(address _unregisteredDelegate) public {
+        // Mock and expect the call to the previous registry
+        vm.mockCall(address(_previousRegistry), abi.encodeCall(registry.deployerOf, (_unregisteredDelegate)), abi.encode(_deployer));
+        vm.expectCall(address(_previousRegistry), abi.encodeCall(registry.deployerOf, (_unregisteredDelegate)));
+
+        // Check: is delegate returned via the call to the previous registry?
+        assertTrue(registry.deployerOf(_unregisteredDelegate) == _deployer);
     }
 }
 
