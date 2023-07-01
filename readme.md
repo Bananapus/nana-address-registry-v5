@@ -3,16 +3,18 @@
 ## Summary
 Provide an easy to access function linking Juicebox protocol pay and redemption delegate with their respective deployer address.
 This registry use create and create2 to, based on a deployer address and a nonce, generate a deterministic address for a delegate.
-This address is then used as a key to store the deployer address (after sanity check).
+This address is then used as a key to store the deployer address.
 
 ## Design
 ### Flow
 After deploying a delegate, any addresses can call `registry.addDelegate(address deployer, uint256 nonce)` to add it. The registry will compute the corresponding 
-delegate address, check if it is a valid delegate and add it. Alternatively, addDelegateCreate2(address _deployer, bytes32 _salt, bytes calldata _bytecode) can
-be used to add delegate deployed from a contract, using create2.
+delegate address and add it. Alternatively, addDelegateCreate2(address _deployer, bytes32 _salt, bytes calldata _bytecode) can
+be used to add delegate deployed from a contract, using create2. This registry doesn't inforce any delegate interface implementation (and could be used for any deployed contract).
 
 The frontend might retrieve the correct nonce, for both contract and eoa, using  ethers `provider.getTransactionCount(address)` or web3js `web3.eth.getTransactionCount` just *before* the delegate deployment (if adding a delegate at a later time, manual nonce counting might be needed).
 Create2 salt is based on the delegate deployer own internal logic while the deployment bytecode can be retrieved in the deployment transaction (off-chain) or via `abi.encodePacked(type(delegateContract).creationCode, abi.encode(constructorArguments))` (on-chain)
+
+This registry is the second iteration and fallback on the previous version, if needed, when calling `deployerOf`.
 
 ### Contracts/interface
 - JBDelegatesRegistry: the registry
