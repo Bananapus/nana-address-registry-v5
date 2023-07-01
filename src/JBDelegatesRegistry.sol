@@ -81,8 +81,8 @@ contract JBDelegatesRegistry is IJBDelegatesRegistry {
     function deployerOf(address _delegate) external view override returns (address _deployer) {
         _deployer = _deployerOf[_delegate];
 
-        // Retrocompatibility: return the entry from the previous registry, if none are found in this one
-        if(_deployer == address(0)) _deployer = oldRegistry.deployerOf(_delegate);
+        // Retrocompatibility: return the entry from the previous registry (if any), if none are found in this one
+        if(_deployer == address(0) && oldRegistry != IJBDelegatesRegistry(address(0))) _deployer = oldRegistry.deployerOf(_delegate);
     }
 
     //////////////////////////////////////////////////////////////
