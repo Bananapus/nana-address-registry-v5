@@ -6,7 +6,6 @@ import "@juice-delegate-registry/JBDelegatesRegistry.sol";
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';
 import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';
 
-import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import 'forge-std/Test.sol';
 
 contract JBDelegatesRegistryTest is Test {
@@ -14,11 +13,14 @@ contract JBDelegatesRegistryTest is Test {
 
     address _owner = makeAddr("_owner");
     address _deployer = makeAddr("_deployer");
+    IJBDelegatesRegistry _previousRegistry = IJBDelegatesRegistry(makeAddr("_previousRegistry"));
 
     JBDelegatesRegistry registry;
 
     function setUp() public {
-        registry = new JBDelegatesRegistry();
+        registry = new JBDelegatesRegistry(_previousRegistry);
+
+        vm.etch(address(_previousRegistry), bytes('69'));
     }
 
     /**
@@ -31,22 +33,22 @@ contract JBDelegatesRegistryTest is Test {
             vm.setNonce(address(_deployer), _nonce);
 
         vm.prank(_deployer);
-        address _mockValidDelegate = address(new MockValidDelegate(type(IJBPayDelegate).interfaceId));
+        address _mockValidDelegate = address(new MockDeployment());
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
         emit DelegateAdded(_mockValidDelegate, _deployer);
 
-        // -- transaction --
+        // Test: add the delegate
         registry.addDelegate(_deployer, _nonce);
 
         // Check: is delegate added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(_mockValidDelegate) == _deployer);
     }
 
-    // /**
-    //  * @custom:test When adding a redemption delegate, the transaction is successful, correct event is emited and the delegate is added to the mapping
-    //  */
+    /**
+     * @custom:test When adding a redemption delegate, the transaction is successful, correct event is emited and the delegate is added to the mapping
+     */
     function test_addDelegate_addRedemptionDelegateFromEOA(uint16 _nonce) public {
         // Set the nonce of the deployer EOA (if we need to increase it)
         vm.assume(_nonce >= vm.getNonce(address(_deployer)));
@@ -54,17 +56,17 @@ contract JBDelegatesRegistryTest is Test {
             vm.setNonce(address(_deployer), _nonce);
 
         vm.prank(_deployer);
-        MockValidDelegate _mockValidDelegate = new MockValidDelegate(type(IJBRedemptionDelegate).interfaceId);
+        MockDeployment _mockContract = new MockDeployment();
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit DelegateAdded(address(_mockValidDelegate), _deployer);
+        emit DelegateAdded(address(_mockContract), _deployer);
 
-        // -- transaction --
+        // Test: add the delegate
         registry.addDelegate(_deployer, _nonce);
 
         // Check: is delegate added to the mapping, with the correct deployer?
-        assertTrue(registry.deployerOf(address(_mockValidDelegate)) == _deployer);
+        assertTrue(registry.deployerOf(address(_mockContract)) == _deployer);
     }
 
     /**
@@ -72,134 +74,78 @@ contract JBDelegatesRegistryTest is Test {
      *              is emited and the delegate is added to the mapping
      */
     function test_addDelegate_addDelegateFromContract(uint16 _nonce) public {
-        MockDeployer _mockDeployer = new MockDeployer();
+        Factory _factory = new Factory();
 
         // Set the nonce of the deployer contract (if we need to increase it)
-        vm.assume(_nonce >= vm.getNonce(address(_mockDeployer)));
-        if (vm.getNonce(address(_mockDeployer)) != _nonce)
-            vm.setNonce(address(_mockDeployer), _nonce);
+        vm.assume(_nonce >= vm.getNonce(address(_factory)));
+        if (vm.getNonce(address(_factory)) != _nonce)
+            vm.setNonce(address(_factory), _nonce);
 
         // Deploy the new delegate
-        address _mockValidDelegate = _mockDeployer.deploy();
+        address _mockValidDelegate = _factory.deploy();
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit DelegateAdded(_mockValidDelegate, address(_mockDeployer));
+        emit DelegateAdded(_mockValidDelegate, address(_factory));
 
-        // -- transaction --
-        registry.addDelegate(address(_mockDeployer), _nonce); // Nonce starts at 1 for contracts
+        // Test: add the delegate
+        registry.addDelegate(address(_factory), _nonce); // Nonce starts at 1 for contracts
 
         // Check: is delegate added to the mapping, with the correct deployer?
-        assertTrue(registry.deployerOf(_mockValidDelegate) == address(_mockDeployer));
+        assertTrue(registry.deployerOf(_mockValidDelegate) == address(_factory));
     }
-
-    /**
-     * @custom:test When adding a contract which doesn't implement IERC165, the transaction reverts
-     */
-    function test_addDelegate_revert_notERC165() public {
-        // There is a bytecode at the _delegate address (vm.etch) but no IERC165 mocked call
-        address _delegate = makeAddr("_delegate");
-        vm.etch(_delegate, '69420');
-        
-        // Check: Is the transaction reverting?
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
-        vm.prank(_deployer);
-
-        // -- transaction --
-        registry.addDelegate(_deployer, 1);
-    }
-
-    /**
-     * @custom:test When adding a contract which doesn't implement IJBPayDelegate or IJBRedemptionDelegate, the transaction reverts
-     */
-    function test_addDelegate_revert_notDelegate(bytes4 _unknowInterfaceId) public {
-        vm.assume(_unknowInterfaceId != type(IJBPayDelegate).interfaceId
-            && _unknowInterfaceId != type(IJBRedemptionDelegate).interfaceId);
-
-        vm.prank(_deployer);
-        new MockValidDelegate(_unknowInterfaceId);
-
-        // Check: Is the transaction reverting?
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
-
-        // -- transaction --
-        registry.addDelegate(_deployer, 0);
-    }
-        
-    /**
-     * @custom:test When adding a delegate which is not a contract (incorrect nonce or not deployed yet), the transaction reverts
-     */
-    function test_addDelegate_revert_notAContract(uint16 _nonce, uint16 _wrongNonce) public {
-        vm.assume(_nonce != _wrongNonce);
-
-        // Set the nonce of the deployer contract (if we need to increase it)
-        vm.assume(_nonce >= vm.getNonce(address(_deployer)));
-        if (vm.getNonce(address(_deployer)) != _nonce)
-            vm.setNonce(address(_deployer), _nonce);
-
-        vm.prank(_deployer);
-        address _mockValidDelegateNonceZero = address(new MockValidDelegate(type(IJBPayDelegate).interfaceId));
-
-        // Check: Is the transaction reverting?       
-        vm.expectRevert(abi.encodeWithSelector(JBDelegatesRegistry.JBDelegatesRegistry_incompatibleDelegate.selector));
-        
-        // -- transaction --
-        registry.addDelegate(_deployer, _wrongNonce);
-
-        // Check: correct nonce are still working
-        vm.expectEmit(true, true, true, true);
-        emit DelegateAdded(address(_mockValidDelegateNonceZero), _deployer);
-        registry.addDelegate(_deployer, _nonce);
-    }
-
+    
     /**
      * @custom:test When adding a delegate deployed from a contract using create2, the transaction is
      *              successful, correct event is emited and the delegate is added to the mapping
      */
     function test_addDelegate_addDelegateFromContract(bytes32 _salt) public {
         vm.assume(_salt != bytes32(0));
-        MockDeployerCreate2 _mockDeployerCreate2 = new MockDeployerCreate2();
-        address _mockValidDelegate = _mockDeployerCreate2.deploy(_salt);
+        Factory _factory = new Factory();
+        address _mockValidDelegate = _factory.deploy(_salt);
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit DelegateAdded(_mockValidDelegate, address(_mockDeployerCreate2));
+        emit DelegateAdded(_mockValidDelegate, address(_factory));
 
-        // -- transaction --
-        registry.addDelegateCreate2(address(_mockDeployerCreate2), _salt, abi.encodePacked(type(MockValidDelegate).creationCode, abi.encode(type(IJBPayDelegate).interfaceId)));
+        // Test: add the delegate
+        registry.addDelegateCreate2(address(_factory), _salt, type(MockDeployment).creationCode);
 
         // Check: is delegate added to the mapping, with the correct deployer?
-        assertTrue(registry.deployerOf(_mockValidDelegate) == address(_mockDeployerCreate2));
-    }
-}
-
-contract MockValidDelegate is IERC165 {
-    // this contract can mock implementing any interface, a pay delegate by default
-    bytes4 _delegateType;
-
-    constructor(bytes4 _interfaceId) {
-        _delegateType = _interfaceId;
+        assertTrue(registry.deployerOf(_mockValidDelegate) == address(_factory));
     }
 
     /**
-     * @notice              The ierc165 supportsInterface function
-     * @param interfaceId   The interface id to check
-     * @return              True if the interface is supported
+     * @custom:test When a deployer isn't found, try calling the previous registry
      */
-    function supportsInterface(bytes4 interfaceId) external override view returns(bool) {
-        return interfaceId == type(IERC165).interfaceId
-            || interfaceId == _delegateType;
+    function test_delegateOf_retrocompatible(address _unregisteredDelegate) public {
+        // Mock and expect the call to the previous registry
+        vm.mockCall(address(_previousRegistry), abi.encodeCall(registry.deployerOf, (_unregisteredDelegate)), abi.encode(_deployer));
+        vm.expectCall(address(_previousRegistry), abi.encodeCall(registry.deployerOf, (_unregisteredDelegate)));
+
+        // Check: is delegate returned via the call to the previous registry?
+        assertTrue(registry.deployerOf(_unregisteredDelegate) == _deployer);
     }
 }
 
-contract MockDeployer {
+// This contract doesn't do much, but is nice
+contract MockDeployment {
+    string _stored = "Hello, world!";
+
+    constructor() {
+    }
+
+    function getFancyData() external view returns(string memory) {
+        return _stored;
+    }
+}
+
+contract Factory {
     function deploy() public returns(address) {
-        return address(new MockValidDelegate(type(IJBPayDelegate).interfaceId));
+        return address(new MockDeployment());
     }
-}
 
-contract MockDeployerCreate2 {
     function deploy(bytes32 _salt) public returns(address) {
-        return address(new MockValidDelegate{salt: _salt}(type(IJBPayDelegate).interfaceId));
+        return address(new MockDeployment{salt: _salt}());
     }
 }
