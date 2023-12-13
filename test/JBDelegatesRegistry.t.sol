@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import 'forge-std/Test.sol';
-import "@juice-address-registry/JBAddressRegistry.sol";
+import "forge-std/Test.sol";
+import "@contracts/JBAddressRegistry.sol";
 
 contract JBAddressRegistryTest is Test {
     event AddressAdded(address indexed addr, address indexed deployer);
@@ -16,13 +16,15 @@ contract JBAddressRegistryTest is Test {
     }
 
     /**
-     * @custom:test When adding a pay delegate, the transaction is successful, correct event is emited and the delegate is added to the mapping
+     * @custom:test When adding a pay delegate, the transaction is successful, correct event is emited and the delegate
+     * is added to the mapping
      */
     function test_addDelegate_addAddressFromEOA(uint16 nonce) public {
         // Set the nonce of the deployer EOA (if we need to increase it)
         vm.assume(nonce >= vm.getNonce(address(deployer)));
-        if (vm.getNonce(address(deployer)) != nonce)
+        if (vm.getNonce(address(deployer)) != nonce) {
             vm.setNonce(address(deployer), nonce);
+        }
 
         vm.prank(deployer);
         address mockValidAddress = address(new MockDeployment());
@@ -31,7 +33,7 @@ contract JBAddressRegistryTest is Test {
         vm.expectEmit(true, true, true, true);
         emit AddressAdded(mockValidAddress, deployer);
 
-        // Test: add the address 
+        // Test: add the address
         registry.addAddressDeployedFrom(deployer, nonce);
 
         // Check: is address added to the mapping, with the correct deployer?
@@ -47,8 +49,9 @@ contract JBAddressRegistryTest is Test {
 
         // Set the nonce of the deployer contract (if we need to increase it)
         vm.assume(nonce >= vm.getNonce(address(factory)));
-        if (vm.getNonce(address(factory)) != nonce)
+        if (vm.getNonce(address(factory)) != nonce) {
             vm.setNonce(address(factory), nonce);
+        }
 
         // Deploy the new address
         address mockValidAddress = factory.deploy();
@@ -63,7 +66,7 @@ contract JBAddressRegistryTest is Test {
         // Check: is address added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(mockValidAddress) == address(factory));
     }
-    
+
     /**
      * @custom:test When adding a delegate deployed from a contract using create2, the transaction is
      *              successful, correct event is emited and the delegate is added to the mapping
@@ -77,7 +80,7 @@ contract JBAddressRegistryTest is Test {
         vm.expectEmit(true, true, true, true);
         emit AddressAdded(mockValidAddress, address(factory));
 
-        // Test: add the address 
+        // Test: add the address
         registry.addAddressDeployedFrom(address(factory), salt, type(MockDeployment).creationCode);
 
         // Check: is address added to the mapping, with the correct deployer?
@@ -89,20 +92,19 @@ contract JBAddressRegistryTest is Test {
 contract MockDeployment {
     string _stored = "Hello, world!";
 
-    constructor() {
-    }
+    constructor() {}
 
-    function getFancyData() external view returns(string memory) {
+    function getFancyData() external view returns (string memory) {
         return _stored;
     }
 }
 
 contract Factory {
-    function deploy() public returns(address) {
+    function deploy() public returns (address) {
         return address(new MockDeployment());
     }
 
-    function deploy(bytes32 _salt) public returns(address) {
+    function deploy(bytes32 _salt) public returns (address) {
         return address(new MockDeployment{salt: _salt}());
     }
 }

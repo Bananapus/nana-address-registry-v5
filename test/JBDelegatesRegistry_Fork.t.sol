@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import 'forge-std/Test.sol';
-import "@juice-address-registry/JBAddressRegistry.sol";
+import "forge-std/Test.sol";
+import "@contracts/JBAddressRegistry.sol";
 
 contract JBAddressRegistryTest_Fork is Test {
     address owner = makeAddr("_owner");
     address deployer = makeAddr("_deployer");
 
-    uint256 blockHeight = 17580288;
+    uint256 blockHeight = 17_580_288;
 
     JBAddressRegistry registry;
 
@@ -32,9 +32,9 @@ contract JBAddressRegistryTest_Fork is Test {
 
         // Create1 from the factory
         address mockDeployment1 = factory.deploy();
-        
+
         // Create2 from the factory
-        address mockDeployment2 = factory.deploy(keccak256(abi.encode(696969)));
+        address mockDeployment2 = factory.deploy(keccak256(abi.encode(696_969)));
 
         // Test: Add the EOA (nonce 0 from the eoa)
         registry.addAddressDeployedFrom(deployer, 0);
@@ -43,7 +43,9 @@ contract JBAddressRegistryTest_Fork is Test {
         registry.addAddressDeployedFrom(address(factory), 1);
 
         // Test: Add the create2
-        registry.addAddressDeployedFrom(address(factory), keccak256(abi.encode(696969)), type(MockDeployment).creationCode);
+        registry.addAddressDeployedFrom(
+            address(factory), keccak256(abi.encode(696_969)), type(MockDeployment).creationCode
+        );
 
         // Check: EOA?
         assertEq(registry.deployerOf(mockContract), deployer);
@@ -60,20 +62,19 @@ contract JBAddressRegistryTest_Fork is Test {
 contract MockDeployment {
     string _stored = "Hello, world!";
 
-    constructor() {
-    }
+    constructor() {}
 
-    function getFancyData() external view returns(string memory) {
+    function getFancyData() external view returns (string memory) {
         return _stored;
     }
 }
 
 contract Factory {
-    function deploy() public returns(address) {
+    function deploy() public returns (address) {
         return address(new MockDeployment());
     }
 
-    function deploy(bytes32 _salt) public returns(address) {
+    function deploy(bytes32 _salt) public returns (address) {
         return address(new MockDeployment{salt: _salt}());
     }
 }
