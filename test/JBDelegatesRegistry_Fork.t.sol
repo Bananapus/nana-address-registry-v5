@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
-import "@contracts/JBAddressRegistry.sol";
+import "src/JBAddressRegistry.sol";
 
 contract JBAddressRegistryTest_Fork is Test {
     address owner = makeAddr("_owner");

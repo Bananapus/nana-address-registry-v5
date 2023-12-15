@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
-import "@contracts/JBAddressRegistry.sol";
+import "src/JBAddressRegistry.sol";
 import "forge-std/Script.sol";
 
 contract Deploy is Script {

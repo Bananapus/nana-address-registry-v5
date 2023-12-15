@@ -1,9 +1,10 @@
-# Juice Delegates Registry
+# Juicebox Hook Registry
 
-## Summary
-Provide an easy to access function linking Juicebox protocol pay and redemption delegate with their respective deployer address.
-This registry use create and create2 to, based on a deployer address and a nonce, generate a deterministic address for a delegate.
-This address is then used as a key to store the deployer address.
+Provides an accessible function linking pay/redeem hooks with their corresponding deployer addresses.
+
+This registry uses `create` and [`create2`](https://docs.soliditylang.org/en/v0.8.23/control-structures.html#salted-contract-creations-create2) to generate a deterministic address for a hook based on a deployer address and a nonce. This address is then used as a key to store the deployer's address.
+
+*If you're having trouble understanding this contract, take a look at the [core Juicebox contracts](https://github.com/bananapus/juice-contracts-v4) and the [documentation](https://docs.juicebox.money/) first. If you have questions, reach out on [Discord](https://discord.com/invite/ErQYmth4dS).*
 
 ## Design
 ### Flow
