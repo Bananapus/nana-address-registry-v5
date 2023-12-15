@@ -3,10 +3,12 @@ pragma solidity 0.8.23;
 
 import {IJBAddressRegistry} from "./interfaces/IJBAddressRegistry.sol";
 
-/// @notice  This contract is used to register deployers of Juicebox Delegates. It is the deployer responsability to
-/// register their delegates in this registry and make sure the delegate implements IERC165
-/// @dev Mostly for front-end integration purposes. The delegate address is computed from the deployer address and the
-/// nonce used to deploy the delegate.
+/// @notice  This contract intended for registering deployers of Juicebox pay/redeem hooks. It is the deployer's
+/// responsibility to
+/// ensure their hook implements `IERC165` and is registered with this registry.
+/// @dev This registry is intended for client integration purposes. The hook address is computed from the deployer's
+/// address and the
+/// nonce used to deploy the hook.
 contract JBAddressRegistry is IJBAddressRegistry {
     //*********************************************************************//
     // --------------------------- custom errors ------------------------- //
@@ -32,31 +34,31 @@ contract JBAddressRegistry is IJBAddressRegistry {
     // ---------------------- external transactions ---------------------- //
     //*********************************************************************//
 
-    /// @notice Add a delegate to the registry (needs to implement erc165, a delegate type and deployed using create)
+    /// @notice Add a hook to the registry (needs to implement erc165, a hook type and deployed using create)
     /// @param deployer The address of the deployer of a given address.
     /// @param nonce The nonce used to deploy the address.
     function addAddressDeployedFrom(address deployer, uint256 nonce) external override {
-        // Compute the _delegate address, as create1 deployed at _nonce
-        address delegate = _addressFrom(deployer, nonce);
+        // Compute the _hook address, as create1 deployed at _nonce
+        address hook = _addressFrom(deployer, nonce);
 
-        // Add the delegate based on the computed address
-        _addDelegate(delegate, deployer);
+        // Add the hook based on the computed address
+        _addHook(hook, deployer);
     }
 
     /// @notice Add an address to the registry.
-    /// @dev `salt` is based on the delegate deployer own internal logic while the deployment bytecode can be retrieved
-    /// in the deployment transaction (off-chain) or via abi.encodePacked(type(delegateContract).creationCode,
+    /// @dev `salt` is based on the hook deployer own internal logic while the deployment bytecode can be retrieved
+    /// in the deployment transaction (off-chain) or via abi.encodePacked(type(hookContract).creationCode,
     /// abi.encode(constructorArguments)) (on-chain)
     /// @param deployer The address of the address's deployer.
-    /// @param salt A unique salt used to deploy the delegate.
-    /// @param bytecode The deployment bytecode used to deploy the delegate (ie including constructor and its arguments)
+    /// @param salt A unique salt used to deploy the hook.
+    /// @param bytecode The deployment bytecode used to deploy the hook (ie including constructor and its arguments)
     function addAddressDeployedFrom(address deployer, bytes32 salt, bytes calldata bytecode) external override {
-        // Compute the _delegate address, based on create2 salt and deployment bytecode
-        address delegate =
+        // Compute the _hook address, based on create2 salt and deployment bytecode
+        address hook =
             address(uint160(uint256(keccak256(abi.encodePacked(bytes1(0xff), deployer, salt, keccak256(bytecode))))));
 
-        // Add the delegate based on the computed address
-        _addDelegate(delegate, deployer);
+        // Add the hook based on the computed address
+        _addHook(hook, deployer);
     }
 
     //*********************************************************************//
@@ -66,7 +68,7 @@ contract JBAddressRegistry is IJBAddressRegistry {
     /// @notice Add an address to the mapping.
     /// @param addr The address.
     /// @param deployer The deployer address.
-    function _addDelegate(address addr, address deployer) private {
+    function _addHook(address addr, address deployer) private {
         deployerOf[addr] = deployer;
 
         emit AddressAdded(addr, deployer);

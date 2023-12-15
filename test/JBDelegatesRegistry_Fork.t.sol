@@ -20,7 +20,7 @@ contract JBAddressRegistryTest_Fork is Test {
     }
 
     /**
-     * @custom:test When adding a new delegate, it, well, workd
+     * @custom:test When adding a new hook, it, well, workd
      */
     function test_integration_newDeployments() public {
         // Deploy a MockDeployment factory

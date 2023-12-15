@@ -16,10 +16,10 @@ contract JBAddressRegistryTest is Test {
     }
 
     /**
-     * @custom:test When adding a pay delegate, the transaction is successful, correct event is emited and the delegate
+     * @custom:test When adding a pay hook, the transaction is successful, correct event is emited and the hook
      * is added to the mapping
      */
-    function test_addDelegate_addAddressFromEOA(uint16 nonce) public {
+    function test_addHook_addAddressFromEOA(uint16 nonce) public {
         // Set the nonce of the deployer EOA (if we need to increase it)
         vm.assume(nonce >= vm.getNonce(address(deployer)));
         if (vm.getNonce(address(deployer)) != nonce) {
@@ -41,8 +41,8 @@ contract JBAddressRegistryTest is Test {
     }
 
     /**
-     * @custom:test When adding a delegate deployed from a contract, the transaction is successful, correct event
-     *              is emited and the delegate is added to the mapping
+     * @custom:test When adding a hook deployed from a contract, the transaction is successful, correct event
+     *              is emited and the hook is added to the mapping
      */
     function test_addAddress_addAddressFromContract(uint16 nonce) public {
         Factory factory = new Factory();
@@ -68,8 +68,8 @@ contract JBAddressRegistryTest is Test {
     }
 
     /**
-     * @custom:test When adding a delegate deployed from a contract using create2, the transaction is
-     *              successful, correct event is emited and the delegate is added to the mapping
+     * @custom:test When adding a hook deployed from a contract using create2, the transaction is
+     *              successful, correct event is emited and the hook is added to the mapping
      */
     function test_addAddress_addAddressFromContract(bytes32 salt) public {
         vm.assume(salt != bytes32(0));
