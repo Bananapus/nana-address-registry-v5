@@ -37,15 +37,13 @@ contract JBAddressRegistryTest_Fork is Test {
         address mockDeployment2 = factory.deploy(keccak256(abi.encode(696_969)));
 
         // Test: Add the EOA (nonce 0 from the eoa)
-        registry.addAddressDeployedFrom(deployer, 0);
+        registry.registerAddress(deployer, 0);
 
         // Test: Add the create1 (nonce 1 from the factory)
-        registry.addAddressDeployedFrom(address(factory), 1);
+        registry.registerAddress(address(factory), 1);
 
         // Test: Add the create2
-        registry.addAddressDeployedFrom(
-            address(factory), keccak256(abi.encode(696_969)), type(MockDeployment).creationCode
-        );
+        registry.registerAddress(address(factory), keccak256(abi.encode(696_969)), type(MockDeployment).creationCode);
 
         // Check: EOA?
         assertEq(registry.deployerOf(mockContract), deployer);

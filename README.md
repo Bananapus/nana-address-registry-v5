@@ -43,14 +43,14 @@ We recommend using [Juan Blanco's solidity extension](https://marketplace.visual
 
 ## Flow
 
-- After deploying a hook, any addresses can call `JBAddressRegistry.addAddressDeployedFrom(address deployer, uint256 nonce)` to add it to the registry. The registry will compute and store the corresponding hook address.
-- Alternatively, `JBAddressRegistry.addAddressDeployedFrom(address deployer, bytes32 salt, bytes calldata bytecode)` will compute and store the hook deployed from a contract using `create2`.
+- After deploying a hook, any addresses can call `JBAddressRegistry.registerAddress(address deployer, uint256 nonce)` to add it to the registry. The registry will compute and store the corresponding hook address.
+- Alternatively, `JBAddressRegistry.registerAddress(address deployer, bytes32 salt, bytes calldata bytecode)` will compute and store the hook deployed from a contract using `create2`.
 
-The registry doesn't enforce the implementation of any hook interfaces, and could be used for any contract.
+The registry doesn't enforce `IERC165` or the implementation of any hook interfaces, meaning it could be used for any contract deployed with `create`/`create2`.
 
 Clients can retrieve the nonce for the contract and an EOA using `provider.getTransactionCount(address)` from `ethers.js` or `web3.eth.getTransactionCount` from `web3.js` just *before* the hook's deployment. If registering a hook later on, clients may need to manually calculate the nonce.
 
-The `create2` salt is based on the hook deployer's own logic. The deployment bytecode can be retrieved in the offchain from the deployment transaction or onchain via `abi.encodePacked(type(hookContract).creationCode, abi.encode(constructorArguments))`.
+The `create2` salt is determined by a given deployer's logic. The deployment bytecode can be retrieved offchain (from the deployment transaction) or onchain (with `abi.encodePacked(type(deployedContract).creationCode, abi.encode(constructorArguments))`).
 
 This registry is the second iteration and will fall back to the previous version as needed when calling `deployerOf`.
 

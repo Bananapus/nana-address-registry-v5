@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "src/JBAddressRegistry.sol";
 
 contract JBAddressRegistryTest is Test {
-    event AddressAdded(address indexed addr, address indexed deployer);
+    event AddressRegistered(address indexed addr, address indexed deployer);
 
     address owner = makeAddr("_owner");
     address deployer = makeAddr("_deployer");
@@ -31,10 +31,10 @@ contract JBAddressRegistryTest is Test {
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressAdded(mockValidAddress, deployer);
+        emit AddressRegistered(mockValidAddress, deployer);
 
         // Test: add the address
-        registry.addAddressDeployedFrom(deployer, nonce);
+        registry.registerAddress(deployer, nonce);
 
         // Check: is address added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(mockValidAddress) == deployer);
@@ -58,10 +58,10 @@ contract JBAddressRegistryTest is Test {
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressAdded(mockValidAddress, address(factory));
+        emit AddressRegistered(mockValidAddress, address(factory));
 
         // Test: add the address
-        registry.addAddressDeployedFrom(address(factory), nonce); // Nonce starts at 1 for contracts
+        registry.registerAddress(address(factory), nonce); // Nonce starts at 1 for contracts
 
         // Check: is address added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(mockValidAddress) == address(factory));
@@ -78,10 +78,10 @@ contract JBAddressRegistryTest is Test {
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressAdded(mockValidAddress, address(factory));
+        emit AddressRegistered(mockValidAddress, address(factory));
 
         // Test: add the address
-        registry.addAddressDeployedFrom(address(factory), salt, type(MockDeployment).creationCode);
+        registry.registerAddress(address(factory), salt, type(MockDeployment).creationCode);
 
         // Check: is address added to the mapping, with the correct deployer?
         assertTrue(registry.deployerOf(mockValidAddress) == address(factory));
