@@ -19,7 +19,7 @@ contract JBAddressRegistryTest_Fork is Test {
         registry = new JBAddressRegistry();
     }
 
-    /// @notice Make sure adding new hook works.
+    /// @custom:test Make sure adding a new hook works for both `create1` and `create2`.
     function test_integration_newDeployments() public {
         // Deploy a `MockDeployment` factory.
         Factory factory = new Factory();
