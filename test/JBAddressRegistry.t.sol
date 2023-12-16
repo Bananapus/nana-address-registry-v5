@@ -15,7 +15,8 @@ contract JBAddressRegistryTest is Test {
         registry = new JBAddressRegistry();
     }
 
-    /// @custom:test When registering a pay hook deployed by an EOA, ensure that the transaction is successful, that the correct event is emitted, and that the hook is added to the mapping.
+    /// @custom:test When registering a pay hook deployed by an EOA, ensure that the transaction is successful, that the
+    /// correct event is emitted, and that the hook is added to the mapping.
     function test_addHook_addAddressFromEOA(uint16 nonce) public {
         // Set the nonce of the deployer EOA (if we need to increase it)
         vm.assume(nonce >= vm.getNonce(address(deployer)));
@@ -37,7 +38,8 @@ contract JBAddressRegistryTest is Test {
         assertTrue(registry.deployerOf(mockValidAddress) == deployer);
     }
 
-    /// @custom:test When registering a pay hook deployed by a contract using `create1`, ensure that the transaction is successful, that the correct event is emitted, and that the hook is added to the mapping.
+    /// @custom:test When registering a pay hook deployed by a contract using `create1`, ensure that the transaction is
+    /// successful, that the correct event is emitted, and that the hook is added to the mapping.
     function test_addAddress_addAddressFromContract(uint16 nonce) public {
         Factory factory = new Factory();
 
@@ -61,7 +63,8 @@ contract JBAddressRegistryTest is Test {
         assertTrue(registry.deployerOf(mockValidAddress) == address(factory));
     }
 
-    /// @custom:test When registering a pay hook deployed by a contract using `create2`, ensure that the transaction is successful, that the correct event is emitted, and that the hook is added to the mapping.
+    /// @custom:test When registering a pay hook deployed by a contract using `create2`, ensure that the transaction is
+    /// successful, that the correct event is emitted, and that the hook is added to the mapping.
     function test_addAddress_addAddressFromContract(bytes32 salt) public {
         vm.assume(salt != bytes32(0));
         Factory factory = new Factory();

@@ -3,7 +3,7 @@ pragma solidity 0.8.23;
 
 import {IJBAddressRegistry} from "./interfaces/IJBAddressRegistry.sol";
 
-/// @notice  This contract intended for registering deployers of Juicebox pay/redeem hooks, but does not enforce
+/// @notice This contract intended for registering deployers of Juicebox pay/redeem hooks, but does not enforce
 /// adherence to an interface, and can be used for any `create`/`create2` deployer. It is the deployer's responsibility
 /// to register their hook.
 /// @dev This registry is intended for client integration purposes. Hook addresses are computed based on the deployer's
