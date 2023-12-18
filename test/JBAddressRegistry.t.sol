@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
-import "@contracts/JBAddressRegistry.sol";
+import "src/JBAddressRegistry.sol";
 
 contract JBAddressRegistryTest is Test {
-    event AddressAdded(address indexed addr, address indexed deployer);
+    event AddressRegistered(address indexed addr, address indexed deployer);
 
     address owner = makeAddr("_owner");
     address deployer = makeAddr("_deployer");
@@ -15,11 +15,9 @@ contract JBAddressRegistryTest is Test {
         registry = new JBAddressRegistry();
     }
 
-    /**
-     * @custom:test When adding a pay delegate, the transaction is successful, correct event is emited and the delegate
-     * is added to the mapping
-     */
-    function test_addDelegate_addAddressFromEOA(uint16 nonce) public {
+    /// @custom:test When registering a pay hook deployed by an EOA, ensure that the transaction is successful, that the
+    /// correct event is emitted, and that the hook is added to the mapping.
+    function test_addHook_addAddressFromEOA(uint16 nonce) public {
         // Set the nonce of the deployer EOA (if we need to increase it)
         vm.assume(nonce >= vm.getNonce(address(deployer)));
         if (vm.getNonce(address(deployer)) != nonce) {
@@ -29,48 +27,44 @@ contract JBAddressRegistryTest is Test {
         vm.prank(deployer);
         address mockValidAddress = address(new MockDeployment());
 
-        // Check: Is the correct event emitted?
+        // Check: is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressAdded(mockValidAddress, deployer);
+        emit AddressRegistered(mockValidAddress, deployer);
 
-        // Test: add the address
-        registry.addAddressDeployedFrom(deployer, nonce);
+        // Test: register the address.
+        registry.registerAddress(deployer, nonce);
 
-        // Check: is address added to the mapping, with the correct deployer?
+        // Check: does the address correspond to the correct deployer in the mapping?
         assertTrue(registry.deployerOf(mockValidAddress) == deployer);
     }
 
-    /**
-     * @custom:test When adding a delegate deployed from a contract, the transaction is successful, correct event
-     *              is emited and the delegate is added to the mapping
-     */
+    /// @custom:test When registering a pay hook deployed by a contract using `create1`, ensure that the transaction is
+    /// successful, that the correct event is emitted, and that the hook is added to the mapping.
     function test_addAddress_addAddressFromContract(uint16 nonce) public {
         Factory factory = new Factory();
 
-        // Set the nonce of the deployer contract (if we need to increase it)
+        // Set the nonce of the deployer contract (if we need to increase it).
         vm.assume(nonce >= vm.getNonce(address(factory)));
         if (vm.getNonce(address(factory)) != nonce) {
             vm.setNonce(address(factory), nonce);
         }
 
-        // Deploy the new address
+        // Deploy the new address.
         address mockValidAddress = factory.deploy();
 
-        // Check: Is the correct event emitted?
+        // Check: is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressAdded(mockValidAddress, address(factory));
+        emit AddressRegistered(mockValidAddress, address(factory));
 
-        // Test: add the address
-        registry.addAddressDeployedFrom(address(factory), nonce); // Nonce starts at 1 for contracts
+        // Test: register the address.
+        registry.registerAddress(address(factory), nonce); // Nonce starts at 1 for contracts
 
-        // Check: is address added to the mapping, with the correct deployer?
+        // Check: does the address correspond to the correct deployer in the mapping?
         assertTrue(registry.deployerOf(mockValidAddress) == address(factory));
     }
 
-    /**
-     * @custom:test When adding a delegate deployed from a contract using create2, the transaction is
-     *              successful, correct event is emited and the delegate is added to the mapping
-     */
+    /// @custom:test When registering a pay hook deployed by a contract using `create2`, ensure that the transaction is
+    /// successful, that the correct event is emitted, and that the hook is added to the mapping.
     function test_addAddress_addAddressFromContract(bytes32 salt) public {
         vm.assume(salt != bytes32(0));
         Factory factory = new Factory();
@@ -78,17 +72,17 @@ contract JBAddressRegistryTest is Test {
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressAdded(mockValidAddress, address(factory));
+        emit AddressRegistered(mockValidAddress, address(factory));
 
-        // Test: add the address
-        registry.addAddressDeployedFrom(address(factory), salt, type(MockDeployment).creationCode);
+        // Test: register the address.
+        registry.registerAddress(address(factory), salt, type(MockDeployment).creationCode);
 
-        // Check: is address added to the mapping, with the correct deployer?
+        // Check: does the address correspond to the correct deployer in the mapping?
         assertTrue(registry.deployerOf(mockValidAddress) == address(factory));
     }
 }
 
-// This contract doesn't do much, but is nice
+// This contract doesn't do much, but is nice.
 contract MockDeployment {
     string _stored = "Hello, world!";
 
