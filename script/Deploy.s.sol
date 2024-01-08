@@ -7,6 +7,6 @@ import "forge-std/Script.sol";
 contract Deploy is Script {
     function run() public {
         vm.broadcast();
-        console.log(address(new JBAddressRegistry()));
+        new JBAddressRegistry();
     }
 }
