@@ -9,11 +9,6 @@ import {IJBAddressRegistry} from "./interfaces/IJBAddressRegistry.sol";
 /// @dev This registry is intended for client integration purposes. Hook addresses are computed based on the deployer's
 /// address and the nonce used to deploy the hook.
 contract JBAddressRegistry is IJBAddressRegistry {
-    //*********************************************************************//
-    // --------------------------- custom errors ------------------------- //
-    //*********************************************************************//
-
-    error JBAddressRegistry_incompatibleAddress();
 
     //*********************************************************************//
     // --------------------- public stored properties -------------------- //
