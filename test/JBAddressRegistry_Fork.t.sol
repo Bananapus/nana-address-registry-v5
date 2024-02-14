@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
-import "src/JBAddressRegistry.sol";
+import "../src/JBAddressRegistry.sol";
 
 contract JBAddressRegistryTest_Fork is Test {
     address owner = makeAddr("_owner");
