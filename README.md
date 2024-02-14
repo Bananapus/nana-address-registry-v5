@@ -1,4 +1,4 @@
-# Juicebox Address Registry
+# Bananapus Address Registry
 
 Provides an accessible function linking pay/redeem hooks with their corresponding deployer addresses.
 
@@ -6,11 +6,27 @@ This registry uses `create1` and [`create2`](https://docs.soliditylang.org/en/v0
 
 Although `JBAddressRegistry` is intended for registering deployers of Juicebox pay/redeem hooks, it does not enforce adherence to an interface, and can be used to track any `create1`/`create2` deployer. It is the deployer's responsibility to register their contracts.
 
-*If you're having trouble understanding this contract, take a look at the [core Juicebox contracts](https://github.com/bananapus/juice-contracts-v4) and the [documentation](https://docs.juicebox.money/) first. If you have questions, reach out on [Discord](https://discord.com/invite/ErQYmth4dS).*
+_If you're having trouble understanding this contract, take a look at the [core protocol contracts](https://github.com/Bananapus/nana-core) and the [documentation](https://docs.juicebox.money/) first. If you have questions, reach out on [Discord](https://discord.com/invite/ErQYmth4dS)._
+
+## Install
+
+For `npm` projects (recommended):
+
+```bash
+npm install @bananapus/address-registry
+```
+
+For `forge` projects (not recommended):
+
+```bash
+forge install Bananapus/nana-address-registry
+```
+
+Add `@bananapus/address-registry/=lib/nana-address-registry/` to `remappings.txt`.
 
 ## Develop
 
-`juice-address-registry` uses the [Foundry](https://github.com/foundry-rs/foundry) development toolchain for builds, tests, and deployments. To get set up, install [Foundry](https://github.com/foundry-rs/foundry):
+`nana-address-registry` uses the [Foundry](https://github.com/foundry-rs/foundry) development toolchain for builds, tests, and deployments. To get set up, install [Foundry](https://github.com/foundry-rs/foundry):
 
 ```bash
 curl -L https://foundry.paradigm.xyz | sh
@@ -28,7 +44,6 @@ Some useful commands:
 
 | Command               | Description                                         |
 | --------------------- | --------------------------------------------------- |
-| `forge install`       | Install the dependencies.                           |
 | `forge build`         | Compile the contracts and write artifacts to `out`. |
 | `forge fmt`           | Lint.                                               |
 | `forge test`          | Run the tests.                                      |
@@ -38,6 +53,20 @@ Some useful commands:
 | `forge clean`         | Remove the build artifacts and cache directories.   |
 
 To learn more, visit the [Foundry Book](https://book.getfoundry.sh/) docs.
+
+## Scripts
+
+For convenience, several utility commands are available in `package.json`.
+
+| Command                           | Description                            |
+| --------------------------------- | -------------------------------------- |
+| `npm test`                        | Run local tests.                       |
+| `npm run test:fork`               | Run fork tests (for use in CI).        |
+| `npm run coverage:lcov`           | Generate an LCOV test coverage report. |
+| `npm run deploy:ethereum-mainnet` | Deploy to Ethereum mainnet             |
+| `npm run deploy:ethereum-sepolia` | Deploy to Ethereum Sepolia testnet     |
+| `npm run deploy:optimism-mainnet` | Deploy to Optimism mainnet             |
+| `npm run deploy:optimism-testnet` | Deploy to Optimism testnet             |
 
 ## Notes
 
