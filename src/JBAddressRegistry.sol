@@ -21,12 +21,6 @@ contract JBAddressRegistry is IJBAddressRegistry {
     mapping(address addr => address deployer) public override deployerOf;
 
     //*********************************************************************//
-    // -------------------------- constructor ---------------------------- //
-    //*********************************************************************//
-
-    constructor() {}
-
-    //*********************************************************************//
     // ---------------------- external transactions ---------------------- //
     //*********************************************************************//
 
@@ -60,16 +54,16 @@ contract JBAddressRegistry is IJBAddressRegistry {
     }
 
     //*********************************************************************//
-    // ---------------------- private transactions ----------------------- //
+    // ---------------------- internal transactions ---------------------- //
     //*********************************************************************//
 
     /// @notice Register a contract's deployer in the `deployerOf` mapping.
     /// @param addr The deployed contract's address.
     /// @param deployer The deployer's address.
-    function _registerAddress(address addr, address deployer) private {
+    function _registerAddress(address addr, address deployer) internal {
         deployerOf[addr] = deployer;
 
-        emit AddressRegistered(addr, deployer);
+        emit AddressRegistered({addr: addr, deployer: deployer});
     }
 
     /// @notice Compute the address of a contract deployed using `create` based on the deployer's address and nonce.
