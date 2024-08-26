@@ -90,6 +90,6 @@ contract JBAddressRegistry is IJBAddressRegistry {
     function _registerAddress(address addr, address deployer) internal {
         deployerOf[addr] = deployer;
 
-        emit AddressRegistered({addr: addr, deployer: deployer});
+        emit AddressRegistered({addr: addr, deployer: deployer, caller: msg.sender});
     }
 }

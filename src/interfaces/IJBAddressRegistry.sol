@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 interface IJBAddressRegistry {
-    event AddressRegistered(address indexed addr, address indexed deployer);
+    event AddressRegistered(address indexed addr, address indexed deployer, address caller);
 
     function deployerOf(address addr) external view returns (address deployer);
 
