@@ -21,12 +21,6 @@ contract JBAddressRegistry is IJBAddressRegistry {
     mapping(address addr => address deployer) public override deployerOf;
 
     //*********************************************************************//
-    // -------------------------- constructor ---------------------------- //
-    //*********************************************************************//
-
-    constructor() {}
-
-    //*********************************************************************//
     // ---------------------- external transactions ---------------------- //
     //*********************************************************************//
 
@@ -60,17 +54,8 @@ contract JBAddressRegistry is IJBAddressRegistry {
     }
 
     //*********************************************************************//
-    // ---------------------- private transactions ----------------------- //
+    // ---------------------- internal transactions ---------------------- //
     //*********************************************************************//
-
-    /// @notice Register a contract's deployer in the `deployerOf` mapping.
-    /// @param addr The deployed contract's address.
-    /// @param deployer The deployer's address.
-    function _registerAddress(address addr, address deployer) private {
-        deployerOf[addr] = deployer;
-
-        emit AddressRegistered(addr, deployer);
-    }
 
     /// @notice Compute the address of a contract deployed using `create` based on the deployer's address and nonce.
     /// @dev Taken from https://ethereum.stackexchange.com/a/87840/68134 - this won't work for nonces > 2**32. If
@@ -97,5 +82,14 @@ contract JBAddressRegistry is IJBAddressRegistry {
             mstore(0, hash)
             addr := mload(0)
         }
+    }
+
+    /// @notice Register a contract's deployer in the `deployerOf` mapping.
+    /// @param addr The deployed contract's address.
+    /// @param deployer The deployer's address.
+    function _registerAddress(address addr, address deployer) internal {
+        deployerOf[addr] = deployer;
+
+        emit AddressRegistered({addr: addr, deployer: deployer, caller: msg.sender});
     }
 }

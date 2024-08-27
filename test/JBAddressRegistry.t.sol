@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "../src/JBAddressRegistry.sol";
 
 contract JBAddressRegistryTest is Test {
-    event AddressRegistered(address indexed addr, address indexed deployer);
+    event AddressRegistered(address indexed addr, address indexed deployer, address caller);
 
     address owner = makeAddr("_owner");
     address deployer = makeAddr("_deployer");
@@ -29,7 +29,7 @@ contract JBAddressRegistryTest is Test {
 
         // Check: is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressRegistered(mockValidAddress, deployer);
+        emit AddressRegistered(mockValidAddress, deployer, address(this));
 
         // Test: register the address.
         registry.registerAddress(deployer, nonce);
@@ -54,7 +54,7 @@ contract JBAddressRegistryTest is Test {
 
         // Check: is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressRegistered(mockValidAddress, address(factory));
+        emit AddressRegistered(mockValidAddress, address(factory), address(this));
 
         // Test: register the address.
         registry.registerAddress(address(factory), nonce); // Nonce starts at 1 for contracts
@@ -72,7 +72,7 @@ contract JBAddressRegistryTest is Test {
 
         // Check: Is the correct event emitted?
         vm.expectEmit(true, true, true, true);
-        emit AddressRegistered(mockValidAddress, address(factory));
+        emit AddressRegistered(mockValidAddress, address(factory), address(this));
 
         // Test: register the address.
         registry.registerAddress(address(factory), salt, type(MockDeployment).creationCode);
