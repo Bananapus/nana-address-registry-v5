@@ -7,6 +7,21 @@ optimizer_runs = 10000000
 block_number = 14126430
 block_timestamp = 1643802347
 runs = 4096
+extra_output = ['storageLayout']
+fs_permissions = [{ access = "read-write", path = "./"}]
+
+[rpc_endpoints]
+ethereum ="${RPC_ETHEREUM_MAINNET}"
+optimism = "${RPC_OPTIMISM_MAINNET}"
+polygon = "${RPC_POLYGON_MUMBAI}"
+arbitrum = "${RPC_ARBITRUM_MAINNET}"
+base = "${RPC_BASE_MAINET}"
+arbitrum_sepolia = "${RPC_ARBITRUM_SEPOLIA}"
+ethereum_sepolia ="${RPC_ETHEREUM_SEPOLIA}"
+optimism_sepolia = "${RPC_OPTIMISM_SEPOLIA}"
+polygon_mumbai = "${RPC_POLYGON_MUMBAI}"
+base_sepolia = "${RPC_BASE_SEPOLIA}"
+
 
 [fmt]
 number_underscore = "thousands"
