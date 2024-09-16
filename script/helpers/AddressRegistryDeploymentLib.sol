@@ -5,7 +5,7 @@ import {stdJson} from "forge-std/Script.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 import {SphinxConstants, NetworkInfo} from "@sphinx-labs/contracts/SphinxConstants.sol";
-import {IJBAddressRegistry} from "src/interfaces/IJBAddressRegistry.sol";
+import {IJBAddressRegistry} from "../../src/interfaces/IJBAddressRegistry.sol";
 
 struct AddressRegistryDeployment {
     IJBAddressRegistry registry;
