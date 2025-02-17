@@ -43,7 +43,7 @@ library AddressRegistryDeploymentLib {
         returns (AddressRegistryDeployment memory deployment)
     {
         deployment.registry = IJBAddressRegistry(
-            _getDeploymentAddress(path, "nana-address-registry-testnet", network_name, "JBAddressRegistry")
+            _getDeploymentAddress(path, "nana-address-registry", network_name, "JBAddressRegistry")
         );
     }
 
