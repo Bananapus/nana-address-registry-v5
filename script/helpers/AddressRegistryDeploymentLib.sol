@@ -42,9 +42,8 @@ library AddressRegistryDeploymentLib {
         view
         returns (AddressRegistryDeployment memory deployment)
     {
-        deployment.registry = IJBAddressRegistry(
-            _getDeploymentAddress(path, "nana-address-registry-testnet", network_name, "JBAddressRegistry")
-        );
+        deployment.registry =
+            IJBAddressRegistry(_getDeploymentAddress(path, "nana-address-registry", network_name, "JBAddressRegistry"));
     }
 
     /// @notice Get the address of a contract that was deployed by the Deploy script.
